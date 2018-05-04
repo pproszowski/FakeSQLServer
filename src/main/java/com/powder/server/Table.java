@@ -308,12 +308,12 @@ public class Table {
         jsonTable.put("Columns", jsonColumns);
         jsonTable.put("Records", jsonRecords);
 
-        ResourceManager resourceManager = new ResourceManager("res/Storages/Databases/Tables/", name);
+        ResourceManager resourceManager = new ResourceManager("res/Databases/Tables/", name);
         resourceManager.saveJSONToResource(jsonTable);
     }
 
     public void deleteFile(){
-        ResourceManager resourceManager = new ResourceManager("res/Storages/Databases/Tables/", name);
+        ResourceManager resourceManager = new ResourceManager("res/Databases/Tables/", name);
         resourceManager.removeFile();
     }
 }

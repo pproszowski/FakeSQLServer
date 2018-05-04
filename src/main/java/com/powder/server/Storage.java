@@ -16,12 +16,12 @@ public class Storage {
     private List<Database> databases;
     private Database currentDatabase;
 
-    public Storage(String _name) throws IOException, JSONException {
+    private Storage(String _name) throws IOException, JSONException {
         name = _name;
         databases = new ArrayList<>();
     }
 
-    public Storage(JSONObject jsonStorage) throws JSONException, IOException {
+    private Storage(JSONObject jsonStorage) throws JSONException, IOException {
         databases = new ArrayList<>();
         System.out.println(jsonStorage.toString());
         name = jsonStorage.getString("Name");
@@ -45,6 +45,25 @@ public class Storage {
                 }
             }
         }
+    }
+
+    public static Storage getInstance() {
+        Storage storage = null;
+        File file = new File(ClassLoader.getSystemResource("").getPath() + "res" + "/storage.json");
+        try {
+            if(file.exists()){
+                    Scanner scanner = new Scanner(file);
+                    scanner.useDelimiter("\\Z");
+                    JSONObject jsonStorage= new JSONObject(scanner.next());
+                    storage = new Storage(jsonStorage);
+            }else{
+                    storage = new Storage("storage");
+            }
+        } catch (JSONException | IOException e) {
+            e.printStackTrace();
+        }
+
+        return storage;
     }
 
     public void addDatabase(Database _database) throws DatabaseAlreadyExistsException, JSONException, IOException {
@@ -121,7 +140,7 @@ public class Storage {
         }
         jsonStorage.put("DatabaseNames", jsonDatabases);
 
-        ResourceManager resourceManager = new ResourceManager("res/Storages/", name);
+        ResourceManager resourceManager = new ResourceManager("res/", name);
         resourceManager.saveJSONToResource(jsonStorage);
     }
 }

@@ -27,7 +27,7 @@ public class Database {
             tableNames.add(jsonTables.getString(i));
         }
         for(String tableName : tableNames){
-            ResourceManager resourceManager = new ResourceManager("res/Storages/Databases/Tables/", tableName);
+            ResourceManager resourceManager = new ResourceManager("res/Databases/Tables/", tableName);
             JSONObject jsonTable = new JSONObject(resourceManager.readFromResource());
             Table table = new Table(jsonTable);
             tables.add(table);
@@ -85,20 +85,20 @@ public class Database {
             jsonTableNames.put(table.getName());
         }
         jsonDatabase.put("Tables", jsonTableNames);
-        ResourceManager resourceManager = new ResourceManager("res/Storages/Databases/", name);
+        ResourceManager resourceManager = new ResourceManager("res/Databases/", name);
         resourceManager.saveJSONToResource(jsonDatabase);
 
 
     }
 
     public void deleteFile(){
-        ResourceManager resourceManager = new ResourceManager("res/Storages/Databases/", name);
+        ResourceManager resourceManager = new ResourceManager("res/Databases/", name);
         resourceManager.removeFile();
     }
 
     public void deleteTables() {
         for(Table table : tables){
-            ResourceManager resourceManager = new ResourceManager("res/Storage/Databases/Tables/", table.getName());
+            ResourceManager resourceManager = new ResourceManager("res/Databases/Tables/", table.getName());
             resourceManager.removeFile();
         }
     }

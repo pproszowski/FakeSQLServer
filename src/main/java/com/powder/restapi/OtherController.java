@@ -22,13 +22,7 @@ public class OtherController{
     private Storage storage;
 
     OtherController(){
-        try {
-            storage = new Storage("test");
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        storage = Storage.getInstance();
     }
 
     @RequestMapping(method = RequestMethod.POST)
@@ -44,6 +38,6 @@ public class OtherController{
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return response == null ? "ERROR, no response" : response.getMessage();
+        return response != null ? response.getMessage().replaceAll("\\n", "<br>") : "ERROR: response is NULL";
     }
 }
