@@ -32,7 +32,7 @@ public class Storage {
         }
 
         for(String databaseName : databaseNames){
-            ResourceManager resourceManager = new ResourceManager("res/Storages/Databases/",databaseName);
+            ResourceManager resourceManager = new ResourceManager("res/Databases/",databaseName);
             JSONObject jsonDatabase = new JSONObject(resourceManager.readFromResource());
             Database database = new Database(jsonDatabase);
             databases.add(database);
@@ -131,16 +131,20 @@ public class Storage {
     }
 
     public void saveToFile() throws JSONException, IOException {
+
+        ResourceManager resourceManager = new ResourceManager("res/", name);
+        resourceManager.saveJSONToResource(this.toJSON());
+    }
+
+    public JSONObject toJSON() throws JSONException {
         JSONObject jsonStorage = new JSONObject();
-        jsonStorage.put("Name", name);
-        jsonStorage.put( "CurrentDatabase", currentDatabase != null ? currentDatabase.getName() : "null");
         JSONArray jsonDatabases = new JSONArray();
         for(Database database : databases){
             jsonDatabases.put(database.getName());
         }
+        jsonStorage.put("Name", name);
+        jsonStorage.put( "CurrentDatabase", currentDatabase != null ? currentDatabase.getName() : "null");
         jsonStorage.put("DatabaseNames", jsonDatabases);
-
-        ResourceManager resourceManager = new ResourceManager("res/", name);
-        resourceManager.saveJSONToResource(jsonStorage);
+        return jsonStorage;
     }
 }

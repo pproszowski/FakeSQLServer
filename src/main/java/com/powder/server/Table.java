@@ -316,6 +316,21 @@ public class Table {
         ResourceManager resourceManager = new ResourceManager("res/Databases/Tables/", name);
         resourceManager.removeFile();
     }
+
+    public JSONObject toJSON() throws JSONException {
+        JSONArray jsonColumns = new JSONArray();
+        for(Column column : columns){
+            jsonColumns.put(column.toJSON());
+        }
+        JSONArray jsonRecords = new JSONArray();
+        for(Record record : records){
+            jsonRecords.put(record.getValues());
+        }
+        return new JSONObject()
+                    .put("Name", name)
+                    .put("Columns", jsonColumns)
+                    .put("Records", jsonRecords);
+        }
 }
 
 

@@ -64,4 +64,11 @@ public class Column {
     public String toString() {
         return "(COLUMN): {" + name + " : " + type.toString() + " : " + width + "}";
     }
+
+    public JSONObject toJSON() throws JSONException {
+        return new JSONObject()
+                .put("Name", name)
+                .put("Type", type.toJSON())
+                .put("Width", width);
+    }
 }

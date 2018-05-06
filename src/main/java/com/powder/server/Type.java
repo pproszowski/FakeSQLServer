@@ -53,4 +53,11 @@ public class Type {
     public String toString() {
         return "(TYPE) : {" + name +  " : " + limit + "}";
     }
+
+
+    public JSONObject toJSON() throws JSONException {
+        return new JSONObject()
+                .put("Name", name)
+                .put("Limit", limit);
+    }
 }

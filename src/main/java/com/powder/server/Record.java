@@ -134,4 +134,8 @@ public class Record {
         }
         return false;
     }
+
+    public JSONObject toJSON() throws JSONException {
+        return new JSONObject().put("Values", values);
+    }
 }

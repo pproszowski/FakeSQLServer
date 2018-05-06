@@ -39,10 +39,10 @@ public class TableQuery extends Query{
 
                         if(columnNames.size() == 1){
                             if(columnNames.get(0).equals("*")){
-                                response.setMessage(table.selectAll(conditions).show());
+                                response.setJsonObject(table.selectAll(conditions).toJSON());
                             }
                         }else{
-                            response.setMessage(table.select(columnNames, conditions).show());
+                            response.setJsonObject(table.select(columnNames, conditions).toJSON());
                         }
                     break;
                 case "insert":

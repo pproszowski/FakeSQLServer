@@ -1,4 +1,5 @@
 package com.powder.server;
+import com.powder.server.Exception.CurrentDatabaseNotSetException;
 import com.powder.server.Exception.DatabaseAlreadyExistsException;
 import com.powder.server.Exception.DatabaseNotFoundException;
 import org.json.JSONException;
@@ -31,6 +32,7 @@ public class StorageQuery extends Query {
                     storage.setCurrentDatabase(name);
                     storage.saveToFile();
                     response.setMessage("Changed database context to '" + name + "'.");
+                    response.setJsonObject(storage.getCurrentDatabase().toJson());
                     break;
                 case "dropdatabase":
                     storage.deleteDatabase(query.getString("Name"));
@@ -43,6 +45,8 @@ public class StorageQuery extends Query {
             response.setValid(false);
             response.setMessage(e.getMessage());
             return response;
+        } catch (CurrentDatabaseNotSetException e) {
+            e.printStackTrace();
         }
 
         return response;

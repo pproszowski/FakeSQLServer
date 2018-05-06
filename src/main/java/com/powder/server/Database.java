@@ -78,15 +78,8 @@ public class Database {
     }
 
     public void saveToFile() throws JSONException, IOException {
-        JSONObject jsonDatabase = new JSONObject();
-        jsonDatabase.put("Name", name);
-        JSONArray jsonTableNames = new JSONArray();
-        for(Table table : tables){
-            jsonTableNames.put(table.getName());
-        }
-        jsonDatabase.put("Tables", jsonTableNames);
         ResourceManager resourceManager = new ResourceManager("res/Databases/", name);
-        resourceManager.saveJSONToResource(jsonDatabase);
+        resourceManager.saveJSONToResource(toJson());
 
 
     }
@@ -101,5 +94,16 @@ public class Database {
             ResourceManager resourceManager = new ResourceManager("res/Databases/Tables/", table.getName());
             resourceManager.removeFile();
         }
+    }
+
+    public JSONObject toJson() throws JSONException {
+        JSONObject jsonDatabase = new JSONObject();
+        jsonDatabase.put("Name", name);
+        JSONArray jsonTableNames = new JSONArray();
+        for(Table table : tables){
+            jsonTableNames.put(table.getName());
+        }
+        jsonDatabase.put("Tables", jsonTableNames);
+        return jsonDatabase;
     }
 }
