@@ -1,4 +1,4 @@
-package com.powder.server;
+package com.powder.server.logic;
 public class Tuple<T> {
     private T value;
     private String typeName;
@@ -16,6 +16,13 @@ public class Tuple<T> {
         return value;
     }
 
+    public boolean isGreater(Tuple tuple){
+        return Integer.parseInt(String.valueOf(this.value)) > Integer.parseInt(String.valueOf(tuple.value));
+    }
+
+    public boolean isSmaller(Tuple tuple){
+        return Integer.parseInt(String.valueOf(this.value)) < Integer.parseInt(String.valueOf(tuple.value));
+    }
 
     @Override
     public boolean equals(Object obj) {

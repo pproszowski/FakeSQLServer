@@ -1,4 +1,4 @@
-package com.powder.server;
+package com.powder.server.logic;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.powder.server.Exception.*;
@@ -40,6 +40,8 @@ public class TableQuery extends Query{
                         if(columnNames.size() == 1){
                             if(columnNames.get(0).equals("*")){
                                 response.setJsonObject(table.selectAll(conditions).toJSON());
+                            }else{
+                                response.setJsonObject(table.select(columnNames, conditions).toJSON());
                             }
                         }else{
                             response.setJsonObject(table.select(columnNames, conditions).toJSON());
@@ -47,13 +49,13 @@ public class TableQuery extends Query{
                     break;
                 case "insert":
                    table.insert(new Record(query.getJSONObject("Record")));
-                   table.saveToFile();
+                   table.saveToFile(storage.getCurrentDatabase().getName());
                    response.setMessage("Record has been inserted properly");
                     break;
                 case "delete":
                     conditions = Condition.extractConditionsFromJSONArray(query.getJSONArray("Conditions"));
                     howMany = table.delete(conditions);
-                    table.saveToFile();
+                    table.saveToFile(storage.getCurrentDatabase().getName());
                     response.setMessage("(" + howMany + ") rows has been removed");
                     break;
                 case "update":
@@ -62,18 +64,18 @@ public class TableQuery extends Query{
                     );
                     conditions = Condition.extractConditionsFromJSONArray(query.getJSONArray("Conditions"));
                     howMany = table.update(conditions, changes);
-                    table.saveToFile();
+                    table.saveToFile(storage.getCurrentDatabase().getName());
                     response.setMessage("(" + howMany + ") records have been affected");
                     break;
             }
             response.setValid(true);
-        } catch (CurrentDatabaseNotSetException | DuplicateColumnsException | ColumnNotFoundException | DifferentTypesException | TableNotFoundException e) {
+        } catch (FakeSQLException e) {
             response.setValid(false);
-            response.setMessage(e.getMessage());
-            return response;
+            response.setMessage(e.getReason());
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return response;
     }
 

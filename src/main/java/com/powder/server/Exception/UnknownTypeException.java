@@ -1,8 +1,15 @@
 package com.powder.server.Exception;
 
-public class UnknownTypeException extends Throwable {
+public class UnknownTypeException extends FakeSQLException{
+
+    private String typeName;
+
+    public UnknownTypeException(String typeName){
+        this.typeName = typeName;
+    }
+
     @Override
-    public String getMessage() {
-        return "Error: unknown type of variable";
+    public String getReason() {
+        return "Cannot recognize type " + "'" + typeName + "'.";
     }
 }

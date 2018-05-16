@@ -1,5 +1,5 @@
 
-package com.powder.server;
+package com.powder.server.logic;
 import org.json.JSONException;
 
 import java.io.IOException;

@@ -1,8 +1,16 @@
 package com.powder.server.Exception;
 
-public class DifferentTypesException extends Throwable {
+public class DifferentTypesException extends FakeSQLException{
+
+    private String first;
+    private String second;
+    public DifferentTypesException(String first, String second){
+        this.first = first;
+        this.second = second;
+    }
+
     @Override
-    public String getMessage() {
-        return "Different types Exception";
+    public String getReason() {
+        return "Different types: '" + first + "' and '" + second + "'";
     }
 }

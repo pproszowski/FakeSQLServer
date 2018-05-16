@@ -2,10 +2,10 @@ package com.powder.restapi;
 
 import com.powder.server.Exception.BadQueryTypeException;
 import com.powder.server.Exception.CurrentDatabaseNotSetException;
-import com.powder.server.Query;
-import com.powder.server.QueryFactory;
-import com.powder.server.Response;
-import com.powder.server.Storage;
+import com.powder.server.logic.Query;
+import com.powder.server.logic.QueryFactory;
+import com.powder.server.logic.Response;
+import com.powder.server.logic.Storage;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,23 +16,24 @@ import java.io.*;
 
 @RestController
 @RequestMapping("/")
-public class OtherController{
+public class Controller {
 
     private Storage storage;
 
-    OtherController(){
+    Controller(){
         storage = Storage.getInstance();
     }
 
     @RequestMapping(value = "/", produces = "application/json", method = RequestMethod.POST)
     @ResponseBody
     public String index(@RequestBody String string) throws JSONException {
-        JSONObject jsonObject;
+        System.out.println("IN: " + string);
+        JSONObject jsonObject = null;
         Response response = new Response();
         try {
             jsonObject = new JSONObject(string);
         }catch (JSONException e){
-            return e.getMessage();
+            response.setMessage(e.getMessage());
         }
 
         switch (jsonObject.getString("Type")){
@@ -51,6 +52,7 @@ public class OtherController{
         }
 
 
+        System.out.println("OUT: " + response.toJson().toString());
         return response.toJson().toString();
     }
 
@@ -59,9 +61,7 @@ public class OtherController{
         try {
             Query query = QueryFactory.getInstance().getQuery(jsonObject);
             response = storage.executeQuery(query);
-        } catch (BadQueryTypeException | IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
+        } catch (BadQueryTypeException | IOException | JSONException e) {
             e.printStackTrace();
         }
 

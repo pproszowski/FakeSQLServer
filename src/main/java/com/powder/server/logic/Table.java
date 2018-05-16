@@ -1,4 +1,4 @@
-package com.powder.server;
+package com.powder.server.logic;
 import com.powder.server.Exception.*;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -66,9 +66,23 @@ public class Table {
 
     public Table select(List<String> whichColumns, List<Condition> conditions) throws DuplicateColumnsException, DifferentTypesException, ColumnNotFoundException {
 
+        List<String> copy = new ArrayList(whichColumns);
+        copy.removeIf(columnName->{
+           for(Column column : columns){
+               if(columnName.equalsIgnoreCase(column.getName())){
+                   return true;
+               }
+           }
+           return false;
+        });
+
+        if(!copy.isEmpty()){
+            throw new ColumnNotFoundException(copy.get(0), this.getName());
+        }
+
         List<Record> newRecords = new ArrayList<>();
         for(Record record : records){
-            newRecords.add(record.getRecordWithOnlySpecifiedColumns(whichColumns));
+            newRecords.add(record.getRecordWithOnlySpecifiedColumns(whichColumns, getName()));
         }
 
         List<Column> _columns = new ArrayList<>();
@@ -82,26 +96,22 @@ public class Table {
 
         Table table;
         if(conditions.isEmpty()){
-            table = new Table(name, _columns, newRecords).where(conditions);
-            table.insert(newRecords);
-        }else{
             table = new Table(name, _columns, newRecords);
-            table.insert(newRecords);
+        }else{
+            table = new Table(name, _columns, newRecords).where(conditions);
         }
 
         return table;
     }
 
-    public Table where(List<Condition> conditions) throws DuplicateColumnsException, DifferentTypesException, ColumnNotFoundException {
+    public Table where(List<Condition> conditions) throws DuplicateColumnsException {
         List<Record> _records = new ArrayList<>();
         for(Record record : records){
             if(record.meetConditions(conditions)){
                 _records.add(record);
             }
         }
-        Table toReturn = new Table(this.name, this.columns);
-        toReturn.insert(_records);
-        return toReturn;
+        return new Table(this.name, this.columns, _records);
     }
 
     public void insert(Record record) throws DifferentTypesException, ColumnNotFoundException {
@@ -114,7 +124,7 @@ public class Table {
                    if(!column.getType().getName().equalsIgnoreCase("string")){
                        if(!column.getType().getName().equalsIgnoreCase(tuple.getTypeName())){
                            if(! (tuple.getValue() instanceof String && tuple.getValue().equals("null"))){
-                               throw new DifferentTypesException();
+                               throw new DifferentTypesException(column.getType().getName(), tuple.getTypeName());
                            }
                        }
                    }
@@ -135,7 +145,9 @@ public class Table {
 
             records.add(record);
         }else{
-            throw new ColumnNotFoundException();
+            Iterator<String> it = copy.getValues().keySet().iterator();
+            Tuple tuple = copy.getValues().get(it.next());
+            throw new ColumnNotFoundException(tuple.getTypeName(), this.getName());
         }
     }
 
@@ -153,7 +165,7 @@ public class Table {
         }
     }
 
-    public int delete(List<Condition> conditions) throws JSONException, IOException {
+    public int delete(List<Condition> conditions) {
         List<Record> recordsToRemove = new ArrayList<>();
         int sizeBefore = records.size();
         if(conditions.isEmpty()){
@@ -171,7 +183,7 @@ public class Table {
         return sizeBefore - records.size();
     }
 
-    public int update(List<Condition> conditions, Map<String, Tuple> newValues) throws JSONException, IOException {
+    public int update(List<Condition> conditions, Map<String, Tuple> newValues) {
         int howMany = 0;
         List<Record> recordsToUpdate;
         if(conditions.isEmpty()){
@@ -228,17 +240,7 @@ public class Table {
     }
 
     @Override
-    public int hashCode() {
-        int hashcode = 0;
-        for(Column column : columns){
-            hashcode += column.hashCode();
-        }
-        for(Record record : records){
-            hashcode += record.hashCode();
-        }
-        hashcode += name.hashCode();
-        return hashcode;
-    }
+    public int hashCode() { return Objects.hash(columns, records, name); }
 
     public String show() {
         StringBuilder top = null;
@@ -270,8 +272,8 @@ public class Table {
                 for (Column column : columns) {
                     mid.append("|");
                     mid.append(" ");
-                    mid.append(record.getValueFromColumn(column.getName()).getValue());
-                    int howMuchSpaceLeft = column.getWidth() - record.getValueFromColumn(column.getName()).getValue().toString().length() + 1;
+                    mid.append(record.getValueFromColumn(column.getName(), this.getName()).getValue());
+                    int howMuchSpaceLeft = column.getWidth() - record.getValueFromColumn(column.getName(), this.getName()).getValue().toString().length() + 1;
                     for (int i = 0; i < howMuchSpaceLeft; i++) {
                         mid.append(" ");
                     }
@@ -285,7 +287,7 @@ public class Table {
         return top.toString() + bottom.toString() + mid.toString() + bottom.toString();
     }
 
-    public void saveToFile() throws JSONException, IOException {
+    public void saveToFile(String databaseName) throws JSONException, IOException {
         JSONObject jsonTable= new JSONObject();
         jsonTable.put("Name", name);
         JSONArray jsonColumns = new JSONArray();
@@ -308,7 +310,7 @@ public class Table {
         jsonTable.put("Columns", jsonColumns);
         jsonTable.put("Records", jsonRecords);
 
-        ResourceManager resourceManager = new ResourceManager("res/Databases/Tables/", name);
+        ResourceManager resourceManager = new ResourceManager("res/Databases/Tables/" + databaseName + "_", name);
         resourceManager.saveJSONToResource(jsonTable);
     }
 

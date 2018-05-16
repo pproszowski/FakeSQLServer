@@ -1,4 +1,4 @@
-package com.powder.server;
+package com.powder.server.logic;
 import com.powder.server.Exception.TableAlreadyExistsException;
 import com.powder.server.Exception.TableNotFoundException;
 import org.json.JSONArray;
@@ -27,14 +27,14 @@ public class Database {
             tableNames.add(jsonTables.getString(i));
         }
         for(String tableName : tableNames){
-            ResourceManager resourceManager = new ResourceManager("res/Databases/Tables/", tableName);
+            ResourceManager resourceManager = new ResourceManager("res/Databases/Tables/" + getName() + "_", tableName);
             JSONObject jsonTable = new JSONObject(resourceManager.readFromResource());
             Table table = new Table(jsonTable);
             tables.add(table);
         }
     }
 
-    public void addTable(Table _table) throws TableAlreadyExistsException, JSONException, IOException {
+    public void addTable(Table _table) throws TableAlreadyExistsException {
         for(Table table : tables){
             if(table.getName().equals(_table.getName())){
                 throw new TableAlreadyExistsException(table.getName() ,this.getName());

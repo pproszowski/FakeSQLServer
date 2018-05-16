@@ -1,7 +1,5 @@
-package com.powder.server;
-import com.powder.server.Exception.CurrentDatabaseNotSetException;
-import com.powder.server.Exception.DatabaseAlreadyExistsException;
-import com.powder.server.Exception.DatabaseNotFoundException;
+package com.powder.server.logic;
+import com.powder.server.Exception.FakeSQLException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,11 +39,10 @@ public class StorageQuery extends Query {
                     break;
             }
             response.setValid(true);
-        } catch (DatabaseAlreadyExistsException | DatabaseNotFoundException | IOException e) {
+        } catch (FakeSQLException e) {
             response.setValid(false);
-            response.setMessage(e.getMessage());
-            return response;
-        } catch (CurrentDatabaseNotSetException e) {
+            response.setMessage(e.getReason());
+        } catch (IOException e) {
             e.printStackTrace();
         }
 

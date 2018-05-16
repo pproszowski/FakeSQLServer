@@ -1,4 +1,4 @@
-package com.powder.server;
+package com.powder.server.logic;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,9 +64,9 @@ public class Condition {
             case "=":
                 return tuple.equals(_tuple);
             case ">":
-                return (int) tuple.getValue() > (int) tuple.getValue();
+                return tuple.isGreater(_tuple);
             case "<":
-                return (int) tuple.getValue() < (int) tuple.getValue();
+                return tuple.isSmaller(_tuple);
             default:
                 return false;
         }

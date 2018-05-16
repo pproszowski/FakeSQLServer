@@ -1,6 +1,6 @@
 package com.powder.server.Exception;
 
-public class TableNotFoundException extends Throwable {
+public class TableNotFoundException extends FakeSQLException{
     private String databaseName;
     private String tableName;
     public TableNotFoundException(String _databaseName, String _tableName){
@@ -8,7 +8,7 @@ public class TableNotFoundException extends Throwable {
         tableName = _tableName;
     }
     @Override
-    public String getMessage() {
-        return "Error: unable to find table " + tableName + " in database " + databaseName;
+    public String getReason() {
+        return "Error: unable to find table '" + tableName + "' in database '" + databaseName + "'.";
     }
 }

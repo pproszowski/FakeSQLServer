@@ -1,4 +1,4 @@
-package com.powder.server;
+package com.powder.server.logic;
 import com.powder.server.Exception.BadQueryTypeException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -6,9 +6,11 @@ import org.json.JSONObject;
 public class QueryFactory {
     private String type;
     private static QueryFactory ourInstance = new QueryFactory();
+
     public static QueryFactory getInstance() {
         return ourInstance;
     }
+
     private QueryFactory() {
     }
 

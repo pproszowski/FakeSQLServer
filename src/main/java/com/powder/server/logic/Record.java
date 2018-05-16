@@ -1,34 +1,24 @@
-package com.powder.server;
+package com.powder.server.logic;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.powder.server.Exception.ColumnNotFoundException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Record {
     private Map<String, Tuple> values;
 
     public Record(Map<String, Tuple> _values){
-        values = new HashMap<>(_values);
+        values = new HashMap<>();
+        for(Map.Entry<String, Tuple> entry : _values.entrySet()){
+            values.put(entry.getKey().toLowerCase(), entry.getValue());
+        }
     }
 
     public Record(Record _record){
         this.values = new HashMap<>(_record.values);
-    }
-
-    public Record(Record _record, List<String> columnNames) {
-        values = new HashMap<>(_record.getValues());
-        Map<String, Tuple> toRemove = new HashMap<>();
-        for(Map.Entry<String, Tuple> entry : values.entrySet()){
-            if(!(columnNames.contains(entry.getKey()))){
-                toRemove.put(entry.getKey(), entry.getValue());
-            }
-        }
-        values.entrySet().removeAll(toRemove.entrySet());
     }
 
     public Record(JSONObject record) {
@@ -62,22 +52,20 @@ public class Record {
 
     @Override
     public int hashCode() {
-        int hashcode = 0;
-        for(Map.Entry<String, Tuple> entry : values.entrySet()){
-            hashcode += entry.getValue().hashCode();
-            hashcode += entry.getKey().hashCode();
-        }
-        return hashcode;
+        return Objects.hash(values);
     }
 
-    public Record getRecordWithOnlySpecifiedColumns(List<String> whichColumns){
+    public Record getRecordWithOnlySpecifiedColumns(List<String> whichColumns, String tableName) throws ColumnNotFoundException {
         Map<String, Tuple> newValues = new HashMap<>();
-        for(Map.Entry entry : values.entrySet()){
-            String columnName = (String) entry.getKey();
-            if(whichColumns.contains(columnName)){
-                newValues.put((String)entry.getKey(), (Tuple)entry.getValue());
+
+        for(String columnName : whichColumns){
+            if(values.keySet().contains(columnName.toLowerCase())){
+                newValues.put(columnName, values.get(columnName.toLowerCase()));
+            }else{
+                throw new ColumnNotFoundException(columnName, tableName);
             }
         }
+
         return new Record(newValues);
     }
 
@@ -95,19 +83,19 @@ public class Record {
         return sB.toString();
     }
 
-    public Tuple getValueFromColumn(String columnName) throws ColumnNotFoundException {
+    public Tuple getValueFromColumn(String columnName, String tableName) throws ColumnNotFoundException {
         for(Map.Entry<String, Tuple> entry : values.entrySet()){
             if(entry.getKey().equalsIgnoreCase(columnName)){
                 return entry.getValue();
             }
         }
-        throw new ColumnNotFoundException();
+        throw new ColumnNotFoundException(columnName, tableName);
     }
 
     public boolean update(String whichColumn, Tuple newValue){
-        if(!values.get(whichColumn).equals(newValue)){
-            values.remove(whichColumn);
-            values.put(whichColumn, newValue);
+        if(values.keySet().contains(whichColumn) && !values.get(whichColumn.toLowerCase()).equals(newValue)){
+            values.remove(whichColumn.toLowerCase());
+            values.put(whichColumn.toLowerCase(), newValue);
             return true;
         }else{
             return false;

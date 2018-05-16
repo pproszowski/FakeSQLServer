@@ -1,5 +1,5 @@
 
-package com.powder.server;
+package com.powder.server.logic;
 import com.powder.server.Exception.CurrentDatabaseNotSetException;
 import com.powder.server.Exception.TableAlreadyExistsException;
 import com.powder.server.Exception.TableNotFoundException;
@@ -25,7 +25,7 @@ public class DatabaseQuery extends Query{
                 case "addtable":
                     Table table = new Table(query.getJSONObject("Table"));
                     database.addTable(table);
-                    table.saveToFile();
+                    table.saveToFile(database.getName());
                     database.saveToFile();
                     response.setMessage("Table " + table.getName() + " has been added");
                     break;

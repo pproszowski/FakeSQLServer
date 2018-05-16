@@ -1,4 +1,4 @@
-package com.powder.server;
+package com.powder.server.logic;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,16 +13,8 @@ public class Response {
         message = "";
     }
 
-    public boolean isValid() {
-        return isValid;
-    }
-
     public void setValid(boolean valid) {
         isValid = valid;
-    }
-
-    public String getMessage() {
-        return message;
     }
 
     public void setMessage(String message) {
